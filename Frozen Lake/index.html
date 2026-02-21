@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧊 Frozen Lake RL Tutorial</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; line-height: 1.7; }
+
+  .hero {
+    background: linear-gradient(135deg, #1a1f36 0%, #0d1b2a 50%, #1a2744 100%);
+    padding: 60px 40px;
+    text-align: center;
+    border-bottom: 1px solid #2d3748;
+  }
+  .hero h1 { font-size: 2.8rem; font-weight: 800; color: #63b3ed; margin-bottom: 10px; }
+  .hero p { font-size: 1.1rem; color: #90cdf4; max-width: 600px; margin: 0 auto; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+  .step {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    border-radius: 16px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 28px;
+    background: #1e2540;
+    border-bottom: 1px solid #2d3748;
+  }
+  .step-num {
+    background: #3182ce;
+    color: white;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; flex-shrink: 0;
+  }
+  .step-header h2 { font-size: 1.25rem; color: #90cdf4; font-weight: 700; }
+  .step-body { padding: 24px 28px; }
+  .step-body p { color: #cbd5e0; margin-bottom: 12px; }
+
+  pre {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    position: relative;
+  }
+  code { font-family: 'Courier New', monospace; font-size: 0.88rem; color: #e6edf3; }
+
+  .comment { color: #8b949e; }
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .str { color: #a5d6ff; }
+  .num { color: #79c0ff; }
+  .cls { color: #ffa657; }
+
+  .tip {
+    background: #1a2744;
+    border-left: 4px solid #3182ce;
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    color: #90cdf4;
+    font-size: 0.95rem;
+  }
+  .tip strong { color: #63b3ed; }
+
+  .warn {
+    background: #2d2008;
+    border-left: 4px solid #d69e2e;
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    color: #f6e05e;
+    font-size: 0.95rem;
+  }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; }
+  .card {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .card .icon { font-size: 2rem; margin-bottom: 8px; }
+  .card h4 { color: #63b3ed; font-size: 0.95rem; margin-bottom: 6px; }
+  .card p { color: #8b949e; font-size: 0.82rem; line-height: 1.5; }
+
+  .algo-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .algo-table th { background: #1e2540; color: #90cdf4; padding: 12px 16px; text-align: left; font-size: 0.9rem; }
+  .algo-table td { padding: 12px 16px; border-top: 1px solid #2d3748; color: #cbd5e0; font-size: 0.88rem; }
+  .algo-table tr:hover td { background: #1e2540; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .badge-blue { background: #1e3a5f; color: #63b3ed; }
+  .badge-green { background: #1a3329; color: #68d391; }
+  .badge-orange { background: #3d2900; color: #f6ad55; }
+
+  .output-box {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #7ee787;
+    margin: 16px 0;
+  }
+
+  h3 { color: #90cdf4; margin: 20px 0 10px; font-size: 1.05rem; }
+
+  .toc {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+  }
+  .toc h3 { color: #63b3ed; margin-top: 0; }
+  .toc ol { padding-left: 20px; }
+  .toc li { color: #90cdf4; margin-bottom: 6px; font-size: 0.95rem; }
+
+  footer { text-align: center; padding: 40px; color: #4a5568; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div style="font-size:3rem;margin-bottom:12px">🧊</div>
+  <h1>Frozen Lake RL Tutorial</h1>
+  <p>Learn Q-Learning, SARSA & Expected SARSA on a stochastic environment — step by step, dead simple.</p>
+</div>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>📋 What You'll Build</h3>
+    <ol>
+      <li>Set up the environment (FrozenLake-v1)</li>
+      <li>Understand the problem visually</li>
+      <li>Implement Q-Learning from scratch</li>
+      <li>Implement SARSA</li>
+      <li>Implement Expected SARSA</li>
+      <li>Plot reward curves & compare algorithms</li>
+      <li>Visualize the Q-table as a heatmap</li>
+    </ol>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <h2>Install Libraries</h2>
+    </div>
+    <div class="step-body">
+      <p>You only need 3 libraries. Open your terminal and run:</p>
+      <pre><code>pip install gymnasium numpy matplotlib</code></pre>
+      <div class="grid-3">
+        <div class="card">
+          <div class="icon">🏋️</div>
+          <h4>gymnasium</h4>
+          <p>Provides the FrozenLake game environment</p>
+        </div>
+        <div class="card">
+          <div class="icon">🔢</div>
+          <h4>numpy</h4>
+          <p>Stores and updates the Q-table (just a 2D array)</p>
+        </div>
+        <div class="card">
+          <div class="icon">📊</div>
+          <h4>matplotlib</h4>
+          <p>Plots reward curves and heatmaps</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <h2>Understand the Environment</h2>
+    </div>
+    <div class="step-body">
+      <p>The FrozenLake map looks like this — a 4×4 grid:</p>
+      <pre><code><span class="comment"># S = Start, F = Frozen (safe), H = Hole (fall in → episode ends), G = Goal</span>
+S F F F
+F H F H
+F F F H
+H F F G</code></pre>
+      <div class="tip">
+        <strong>🎯 Goal:</strong> Move from S (top-left) to G (bottom-right) without falling in a hole (H).
+      </div>
+      <div class="warn">
+        <strong>⚠️ Stochastic (slippery ice):</strong> Even if you say "go right", the agent might slide up or down instead. This is the key challenge — you can't always control where you go!
+      </div>
+      <h3>Actions & Rewards</h3>
+      <table class="algo-table">
+        <tr><th>Action</th><th>Code</th><th>Reward</th></tr>
+        <tr><td>Move Left</td><td>0</td><td>0 (most steps)</td></tr>
+        <tr><td>Move Down</td><td>1</td><td>0 (most steps)</td></tr>
+        <tr><td>Move Right</td><td>2</td><td>+1 (only at Goal)</td></tr>
+        <tr><td>Move Up</td><td>3</td><td>0 or -end (hole)</td></tr>
+      </table>
+      <p>This is called <strong>sparse reward</strong> — you only get +1 when you reach G. Makes learning hard!</p>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <h2>The Q-Table — Core Concept</h2>
+    </div>
+    <div class="step-body">
+      <p>A Q-table is just a grid of numbers. Rows = states (16 squares), Columns = actions (4 directions). Each cell stores: <em>"how good is it to take this action from this state?"</em></p>
+      <pre><code><span class="comment"># Q-table shape: (16 states) x (4 actions)
+# All start at 0, get updated as agent explores</span>
+
+Q[state][action] = <span class="num">0.0</span>  <span class="comment"># initialized</span>
+Q[state][action] = <span class="num">0.73</span> <span class="comment"># after learning "this is a good move"</span></code></pre>
+      <div class="tip">
+        <strong>💡 Key Formula (Bellman Equation):</strong><br>
+        <code>Q[s][a] ← Q[s][a] + α × (reward + γ × max(Q[s']) − Q[s][a])</code><br><br>
+        α = learning rate (how fast to update), γ = discount (how much future rewards matter)
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <h2>Full Python Code — All 3 Algorithms</h2>
+    </div>
+    <div class="step-body">
+      <p>Create a file called <code>frozen_lake.py</code> and paste this complete code:</p>
+      <pre><code><span class="kw">import</span> gymnasium <span class="kw">as</span> gym
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="comment"># ─────────────────────────────────────────────
+# SETTINGS — tweak these to experiment!
+# ─────────────────────────────────────────────</span>
+EPISODES    = <span class="num">5000</span>    <span class="comment"># how many games to play</span>
+ALPHA       = <span class="num">0.8</span>     <span class="comment"># learning rate</span>
+GAMMA       = <span class="num">0.95</span>    <span class="comment"># discount factor</span>
+EPSILON     = <span class="num">1.0</span>     <span class="comment"># start: explore everything</span>
+EPSILON_MIN = <span class="num">0.01</span>   <span class="comment"># stop at 1% random</span>
+EPSILON_DECAY = <span class="num">0.995</span> <span class="comment"># reduce epsilon each episode</span>
+SMOOTH      = <span class="num">100</span>     <span class="comment"># rolling average window</span>
+
+
+<span class="comment"># ─────────────────────────────────────────────
+# HELPER: pick action (epsilon-greedy)
+# ─────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">choose_action</span>(Q, state, epsilon, n_actions):
+    <span class="kw">if</span> np.random.rand() < epsilon:           <span class="comment"># explore</span>
+        <span class="kw">return</span> np.random.randint(n_actions)
+    <span class="kw">return</span> np.argmax(Q[state])               <span class="comment"># exploit best known</span>
+
+
+<span class="comment"># ─────────────────────────────────────────────
+# ALGORITHM 1: Q-Learning (off-policy)
+# Uses: max(Q[next_state]) — always picks best
+# ─────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">q_learning</span>(env):
+    n_s = env.observation_space.n
+    n_a = env.action_space.n
+    Q = np.zeros((n_s, n_a))
+    eps = EPSILON
+    rewards = []
+
+    <span class="kw">for</span> ep <span class="kw">in</span> range(EPISODES):
+        state, _ = env.reset()
+        total_r = <span class="num">0</span>
+
+        <span class="kw">while</span> <span class="cls">True</span>:
+            action = choose_action(Q, state, eps, n_a)
+            next_state, reward, done, truncated, _ = env.step(action)
+
+            <span class="comment"># Q-Learning update: uses MAX of next state</span>
+            best_next = np.max(Q[next_state])
+            Q[state][action] += ALPHA * (
+                reward + GAMMA * best_next - Q[state][action]
+            )
+
+            state = next_state
+            total_r += reward
+            <span class="kw">if</span> done <span class="kw">or</span> truncated: <span class="kw">break</span>
+
+        eps = max(EPSILON_MIN, eps * EPSILON_DECAY)
+        rewards.append(total_r)
+
+    <span class="kw">return</span> Q, rewards
+
+
+<span class="comment"># ─────────────────────────────────────────────
+# ALGORITHM 2: SARSA (on-policy)
+# Uses: Q[next_state][ACTUAL next action taken]
+# ─────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">sarsa</span>(env):
+    n_s = env.observation_space.n
+    n_a = env.action_space.n
+    Q = np.zeros((n_s, n_a))
+    eps = EPSILON
+    rewards = []
+
+    <span class="kw">for</span> ep <span class="kw">in</span> range(EPISODES):
+        state, _ = env.reset()
+        action = choose_action(Q, state, eps, n_a)  <span class="comment"># pick first action</span>
+        total_r = <span class="num">0</span>
+
+        <span class="kw">while</span> <span class="cls">True</span>:
+            next_state, reward, done, truncated, _ = env.step(action)
+            next_action = choose_action(Q, next_state, eps, n_a)
+
+            <span class="comment"># SARSA update: uses ACTUAL next action (not max)</span>
+            Q[state][action] += ALPHA * (
+                reward + GAMMA * Q[next_state][next_action] - Q[state][action]
+            )
+
+            state, action = next_state, next_action
+            total_r += reward
+            <span class="kw">if</span> done <span class="kw">or</span> truncated: <span class="kw">break</span>
+
+        eps = max(EPSILON_MIN, eps * EPSILON_DECAY)
+        rewards.append(total_r)
+
+    <span class="kw">return</span> Q, rewards
+
+
+<span class="comment"># ─────────────────────────────────────────────
+# ALGORITHM 3: Expected SARSA
+# Uses: AVERAGE of all next actions (weighted by policy)
+# ─────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">expected_sarsa</span>(env):
+    n_s = env.observation_space.n
+    n_a = env.action_space.n
+    Q = np.zeros((n_s, n_a))
+    eps = EPSILON
+    rewards = []
+
+    <span class="kw">for</span> ep <span class="kw">in</span> range(EPISODES):
+        state, _ = env.reset()
+        total_r = <span class="num">0</span>
+
+        <span class="kw">while</span> <span class="cls">True</span>:
+            action = choose_action(Q, state, eps, n_a)
+            next_state, reward, done, truncated, _ = env.step(action)
+
+            <span class="comment"># Build policy probability for next state</span>
+            policy = np.ones(n_a) * (eps / n_a)          <span class="comment"># random prob</span>
+            best_a = np.argmax(Q[next_state])
+            policy[best_a] += (1 - eps)                   <span class="comment"># greedy prob</span>
+
+            <span class="comment"># Expected SARSA update: weighted average over all actions</span>
+            expected_q = np.dot(policy, Q[next_state])
+            Q[state][action] += ALPHA * (
+                reward + GAMMA * expected_q - Q[state][action]
+            )
+
+            state = next_state
+            total_r += reward
+            <span class="kw">if</span> done <span class="kw">or</span> truncated: <span class="kw">break</span>
+
+        eps = max(EPSILON_MIN, eps * EPSILON_DECAY)
+        rewards.append(total_r)
+
+    <span class="kw">return</span> Q, rewards
+
+
+<span class="comment"># ─────────────────────────────────────────────
+# PLOT 1: Reward Curves (smoothed)
+# ─────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">smooth</span>(data, window=SMOOTH):
+    <span class="kw">return</span> np.convolve(data, np.ones(window)/window, mode=<span class="str">'valid'</span>)
+
+<span class="kw">def</span> <span class="fn">plot_rewards</span>(ql_r, sarsa_r, esarsa_r):
+    plt.figure(figsize=(<span class="num">10</span>, <span class="num">5</span>))
+    plt.plot(smooth(ql_r),     label=<span class="str">'Q-Learning'</span>,      color=<span class="str">'#63b3ed'</span>, lw=<span class="num">2</span>)
+    plt.plot(smooth(sarsa_r),  label=<span class="str">'SARSA'</span>,           color=<span class="str">'#f6ad55'</span>, lw=<span class="num">2</span>)
+    plt.plot(smooth(esarsa_r), label=<span class="str">'Expected SARSA'</span>,  color=<span class="str">'#68d391'</span>, lw=<span class="num">2</span>)
+    plt.xlabel(<span class="str">'Episode'</span>)
+    plt.ylabel(f<span class="str">'Reward (smoothed over {SMOOTH} eps)'</span>)
+    plt.title(<span class="str">'🧊 FrozenLake: Algorithm Comparison'</span>)
+    plt.legend()
+    plt.grid(alpha=<span class="num">0.3</span>)
+    plt.tight_layout()
+    plt.savefig(<span class="str">'reward_curves.png'</span>, dpi=<span class="num">150</span>)
+    plt.show()
+    print(<span class="str">"✅ Saved: reward_curves.png"</span>)
+
+
+<span class="comment"># ─────────────────────────────────────────────
+# PLOT 2: Q-Table Heatmap (best action values)
+# ─────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">plot_qtable</span>(Q, title=<span class="str">'Q-Table'</span>):
+    <span class="comment"># Max Q-value per state, reshaped to 4x4 grid</span>
+    best_q = np.max(Q, axis=<span class="num">1</span>).reshape(<span class="num">4</span>, <span class="num">4</span>)
+
+    fig, axes = plt.subplots(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">12</span>, <span class="num">4</span>))
+
+    <span class="comment"># Left: max Q-value heatmap</span>
+    im = axes[<span class="num">0</span>].imshow(best_q, cmap=<span class="str">'Blues'</span>)
+    axes[<span class="num">0</span>].set_title(f<span class="str">'{title}: Best Q-Values'</span>)
+    plt.colorbar(im, ax=axes[<span class="num">0</span>])
+    <span class="comment"># Label holes/goal</span>
+    labels = [<span class="str">'S'</span>,<span class="str">'F'</span>,<span class="str">'F'</span>,<span class="str">'F'</span>, <span class="str">'F'</span>,<span class="str">'H'</span>,<span class="str">'F'</span>,<span class="str">'H'</span>,
+              <span class="str">'F'</span>,<span class="str">'F'</span>,<span class="str">'F'</span>,<span class="str">'H'</span>, <span class="str">'H'</span>,<span class="str">'F'</span>,<span class="str">'F'</span>,<span class="str">'G'</span>]
+    <span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">4</span>):
+        <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">4</span>):
+            axes[<span class="num">0</span>].text(j, i, labels[i*<span class="num">4</span>+j],
+                         ha=<span class="str">'center'</span>, va=<span class="str">'center'</span>, fontsize=<span class="num">14</span>, color=<span class="str">'red'</span>)
+
+    <span class="comment"># Right: best action arrows</span>
+    arrow_map = {<span class="num">0</span>:<span class="str">'←'</span>, <span class="num">1</span>:<span class="str">'↓'</span>, <span class="num">2</span>:<span class="str">'→'</span>, <span class="num">3</span>:<span class="str">'↑'</span>}
+    best_a = np.argmax(Q, axis=<span class="num">1</span>).reshape(<span class="num">4</span>, <span class="num">4</span>)
+    axes[<span class="num">1</span>].imshow(best_q, cmap=<span class="str">'Greens'</span>, alpha=<span class="num">0.4</span>)
+    axes[<span class="num">1</span>].set_title(f<span class="str">'{title}: Best Actions'</span>)
+    <span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">4</span>):
+        <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">4</span>):
+            axes[<span class="num">1</span>].text(j, i, arrow_map[best_a[i,j]],
+                         ha=<span class="str">'center'</span>, va=<span class="str">'center'</span>, fontsize=<span class="num">20</span>)
+
+    plt.tight_layout()
+    plt.savefig(<span class="str">'qtable_heatmap.png'</span>, dpi=<span class="num">150</span>)
+    plt.show()
+    print(<span class="str">"✅ Saved: qtable_heatmap.png"</span>)
+
+
+<span class="comment"># ─────────────────────────────────────────────
+# MAIN — Run everything
+# ─────────────────────────────────────────────</span>
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="comment"># is_slippery=True makes it stochastic (harder!)</span>
+    env = gym.make(<span class="str">'FrozenLake-v1'</span>, is_slippery=<span class="cls">True</span>)
+
+    print(<span class="str">"🏃 Training Q-Learning..."</span>)
+    Q_ql, r_ql = q_learning(env)
+
+    print(<span class="str">"🏃 Training SARSA..."</span>)
+    Q_sa, r_sa = sarsa(env)
+
+    print(<span class="str">"🏃 Training Expected SARSA..."</span>)
+    Q_es, r_es = expected_sarsa(env)
+
+    <span class="comment"># Print final win rates</span>
+    <span class="kw">for</span> name, r <span class="kw">in</span> [(<span class="str">'Q-Learning'</span>, r_ql), (<span class="str">'SARSA'</span>, r_sa), (<span class="str">'Exp SARSA'</span>, r_es)]:
+        win_rate = np.mean(r[-<span class="num">500</span>:]) * <span class="num">100</span>
+        print(f<span class="str">"  {name}: {win_rate:.1f}% win rate (last 500 eps)"</span>)
+
+    plot_rewards(r_ql, r_sa, r_es)
+    plot_qtable(Q_ql, title=<span class="str">'Q-Learning'</span>)
+
+    env.close()
+</code></pre>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <h2>Run It!</h2>
+    </div>
+    <div class="step-body">
+      <pre><code>python frozen_lake.py</code></pre>
+      <p>You should see output like this:</p>
+      <div class="output-box">
+🏃 Training Q-Learning...<br>
+🏃 Training SARSA...<br>
+🏃 Training Expected SARSA...<br>
+  Q-Learning:  72.4% win rate (last 500 eps)<br>
+  SARSA:       68.1% win rate (last 500 eps)<br>
+  Exp SARSA:   74.8% win rate (last 500 eps)<br>
+✅ Saved: reward_curves.png<br>
+✅ Saved: qtable_heatmap.png
+      </div>
+      <div class="tip">
+        <strong>💡 Two image files will be saved:</strong> <code>reward_curves.png</code> (algorithm comparison) and <code>qtable_heatmap.png</code> (learned policy visualization).
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <h2>Algorithm Differences — Explained Simply</h2>
+    </div>
+    <div class="step-body">
+      <table class="algo-table">
+        <tr>
+          <th>Algorithm</th>
+          <th>Update Target</th>
+          <th>Type</th>
+          <th>Character</th>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">Q-Learning</span></td>
+          <td>max Q of next state</td>
+          <td>Off-policy</td>
+          <td>Optimistic — assumes you'll always pick the best action next</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">SARSA</span></td>
+          <td>Q of actual next action taken</td>
+          <td>On-policy</td>
+          <td>Conservative — learns from what it actually does (including random exploration)</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">Expected SARSA</span></td>
+          <td>Weighted average of all next actions</td>
+          <td>On-policy</td>
+          <td>Balanced — reduces variance by averaging over all possibilities</td>
+        </tr>
+      </table>
+      <div class="tip">
+        <strong>In practice on FrozenLake:</strong> Expected SARSA usually converges most reliably. Q-Learning can be more aggressive. SARSA is safer/slower to improve.
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <h2>Experiments to Try</h2>
+    </div>
+    <div class="step-body">
+      <h3>🔧 Tweak the settings at the top of the file:</h3>
+
+      <pre><code><span class="comment"># Try is_slippery=False for deterministic (much easier)</span>
+env = gym.make(<span class="str">'FrozenLake-v1'</span>, is_slippery=<span class="cls">False</span>)
+
+<span class="comment"># Try a higher alpha to learn faster (but less stable)</span>
+ALPHA = <span class="num">0.9</span>
+
+<span class="comment"># Try more episodes</span>
+EPISODES = <span class="num">10000</span>
+
+<span class="comment"># Try slower epsilon decay (more exploration)</span>
+EPSILON_DECAY = <span class="num">0.999</span></code></pre>
+
+      <h3>📊 What to notice in the plots:</h3>
+      <p>In the <strong>reward curve</strong>: all algorithms start near 0 (failing), then gradually climb. Expected SARSA typically has less "spiky" behavior.</p>
+      <p>In the <strong>heatmap</strong>: cells near holes should have low Q-values (blue), cells near the goal should be bright (high value). The arrows show the learned policy — a good agent points away from holes and toward G.</p>
+
+      <div class="warn">
+        <strong>⚠️ Results vary each run!</strong> Because the environment is stochastic and we start with random exploration, you'll get slightly different win rates every time. This is normal.
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 8 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">8</div>
+      <h2>Watch Your Agent Play (Optional)</h2>
+    </div>
+    <div class="step-body">
+      <p>After training, add this snippet at the end to watch the trained agent play a game:</p>
+      <pre><code><span class="comment"># Watch the Q-Learning agent play 3 games</span>
+env_render = gym.make(<span class="str">'FrozenLake-v1'</span>, is_slippery=<span class="cls">True</span>, render_mode=<span class="str">'human'</span>)
+
+<span class="kw">for</span> game <span class="kw">in</span> range(<span class="num">3</span>):
+    state, _ = env_render.reset()
+    print(f<span class="str">"\n--- Game {game+1} ---"</span>)
+    <span class="kw">while</span> <span class="cls">True</span>:
+        action = np.argmax(Q_ql[state])   <span class="comment"># greedy, no exploration</span>
+        state, reward, done, truncated, _ = env_render.step(action)
+        <span class="kw">if</span> done <span class="kw">or</span> truncated:
+            print(<span class="str">"Won! 🎉"</span> <span class="kw">if</span> reward > <span class="num">0</span> <span class="kw">else</span> <span class="str">"Fell in hole 😢"</span>)
+            <span class="kw">break</span>
+
+env_render.close()</code></pre>
+    </div>
+  </div>
+
+  <div style="background:#1a2744;border:1px solid #3182ce;border-radius:12px;padding:24px 28px;text-align:center;margin-bottom:32px">
+    <div style="font-size:2rem;margin-bottom:8px">🎓</div>
+    <h3 style="color:#63b3ed;margin:0 0 8px">You're Done!</h3>
+    <p style="color:#90cdf4">You've built 3 RL algorithms from scratch — Q-Learning, SARSA, and Expected SARSA — compared them visually, and learned how agents handle stochastic environments. That's real reinforcement learning.</p>
+  </div>
+
+</div>
+
+<footer>🧊 Frozen Lake RL Tutorial &nbsp;·&nbsp; Built with Gymnasium, NumPy & Matplotlib</footer>
+
+</body>
+</html>
